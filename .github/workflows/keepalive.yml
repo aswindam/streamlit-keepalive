@@ -1,1 +1,18 @@
 
+name: Keep Streamlit Alive
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # runs every 10 minutes (UTC)
+  workflow_dispatch:          # allows manual trigger
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit app
+        shell: bash
+        run: |
+          URL="https://btdgenai.streamlit.app"
+          echo "Pinging $URL at $(date -u) (UTC)"
+          code=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 20 --retry 2 --retry-delay 2 "$URL")
+          echo "HTTP status: $code"
+          if [[ -z "$code" ]]; then echo "No response"; fi
